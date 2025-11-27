@@ -1,19 +1,19 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-    title: 'Test Your Knowledge - Quiz App',
-    description: 'A beautiful, accessible quiz application built with Next.js and TypeScript',
-}
+    title: "Quiz App - Test Your Knowledge",
+    description: "A fun and interactive quiz application to test your knowledge",
+};
 
 export default function RootLayout({
     children,
-}: {
-    children: React.ReactNode
-}) {
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
     return (
         <html lang="en">
-            <body className="min-h-screen quiz-gradient">{children}</body>
+            <body>{children}</body>
         </html>
-    )
+    );
 }

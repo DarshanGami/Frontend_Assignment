@@ -1,84 +1,70 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useQuiz } from '@/hooks/useQuiz'
-import { QuizCard } from '@/components/ui/QuizCard'
-import { ProgressBar } from '@/components/ui/ProgressBar'
-import { QuestionHeader } from '@/components/quiz/QuestionHeader'
-import { QuestionCard } from '@/components/quiz/QuestionCard'
-import { Mascot } from '@/components/quiz/Mascot'
+import { useState } from 'react';
+import { quizQuestions } from '@/data/quizData';
+import QuestionCard from '@/components/QuestionCard';
+import ResultScreen from '@/components/ResultScreen';
 
-/**
- * Main quiz page
- * Displays questions with navigation and progress tracking
- */
 export default function Home() {
-    const router = useRouter()
-    const {
-        state,
-        questions,
-        selectAnswer,
-        nextQuestion,
-        previousQuestion,
-        submitQuiz,
-        getProgress,
-    } = useQuiz()
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>(
+        new Array(quizQuestions.length).fill(null)
+    );
+    const [isQuizComplete, setIsQuizComplete] = useState(false);
 
-    const currentQuestion = questions[state.currentQuestion]
-    const progress = getProgress()
-    const isFirstQuestion = state.currentQuestion === 0
-    const isLastQuestion = state.currentQuestion === questions.length - 1
+    const handleSelectAnswer = (optionIndex: number) => {
+        const newAnswers = [...selectedAnswers];
+        newAnswers[currentQuestion] = optionIndex;
+        setSelectedAnswers(newAnswers);
+    };
 
-    // Handle quiz submission
-    const handleSubmit = () => {
-        submitQuiz()
-        // Navigate to results page with score in URL
-        router.push('/results')
+    const handleNext = () => {
+        if (currentQuestion < quizQuestions.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
+        } else {
+            setIsQuizComplete(true);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentQuestion > 0) {
+            setCurrentQuestion(currentQuestion - 1);
+        }
+    };
+
+    const handleStartAgain = () => {
+        setCurrentQuestion(0);
+        setSelectedAnswers(new Array(quizQuestions.length).fill(null));
+        setIsQuizComplete(false);
+    };
+
+    const calculateScore = (): number => {
+        let correct = 0;
+        selectedAnswers.forEach((answer, index) => {
+            if (answer === quizQuestions[index].correctAnswer) {
+                correct++;
+            }
+        });
+        return Math.round((correct / quizQuestions.length) * 100);
+    };
+
+    if (isQuizComplete) {
+        return <ResultScreen score={calculateScore()} onStartAgain={handleStartAgain} />;
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 relative">
-            <div className="w-full max-w-3xl relative">
-                {/* Quiz Card */}
-                <QuizCard>
-                    {/* Question Header */}
-                    <QuestionHeader />
-
-                    {/* Progress Bar */}
-                    <ProgressBar current={progress.current} total={progress.total} />
-
-                    {/* Question Content with animation */}
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={state.currentQuestion}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <QuestionCard
-                                questionNumber={progress.current}
-                                questionText={currentQuestion.text}
-                                options={currentQuestion.options}
-                                selectedAnswer={state.answers[state.currentQuestion]}
-                                onSelectAnswer={selectAnswer}
-                                onPrevious={previousQuestion}
-                                onNext={nextQuestion}
-                                onSubmit={handleSubmit}
-                                isFirstQuestion={isFirstQuestion}
-                                isLastQuestion={isLastQuestion}
-                                canNavigateBack={state.currentQuestion > 0}
-                                canNavigateForward={state.currentQuestion < questions.length - 1}
-                            />
-                        </motion.div>
-                    </AnimatePresence>
-                </QuizCard>
-
-                {/* Show mascot only on first question */}
-                {isFirstQuestion && <Mascot />}
-            </div>
+        <main className="min-h-screen flex items-center justify-center p-8">
+            <QuestionCard
+                question={quizQuestions[currentQuestion]}
+                currentQuestionNumber={currentQuestion + 1}
+                totalQuestions={quizQuestions.length}
+                selectedAnswer={selectedAnswers[currentQuestion]}
+                onSelectAnswer={handleSelectAnswer}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                canGoNext={selectedAnswers[currentQuestion] !== null}
+                canGoPrevious={currentQuestion > 0}
+            />
         </main>
-    )
+    );
 }

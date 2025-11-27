@@ -1,41 +1,28 @@
 {
   "name": "quiz-app",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "Pixel-perfect quiz application built with Next.js, TypeScript, and Tailwind CSS",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.0.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "framer-motion": "^11.0.3"
+    "framer-motion": "^11.0.0",
+    "next": "^14.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.10.6",
-    "@types/react": "^18.2.46",
-    "@types/react-dom": "^18.2.18",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^8.56.0",
-    "eslint-config-next": "^14.0.4",
-    "eslint-config-prettier": "^9.1.0",
-    "postcss": "^8.4.32",
-    "prettier": "^3.1.1",
+    "@types/node": "^20.12.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^16.0.4",
+    "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.3.3",
-    "@testing-library/react": "^14.1.2",
-    "@testing-library/jest-dom": "^6.1.5",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "typescript": "^5.4.0"
   }
 }
