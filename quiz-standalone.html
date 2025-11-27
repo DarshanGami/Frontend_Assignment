@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Your Knowledge - Quiz App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'quiz-bg-start': '#A8D5E2',
+                        'quiz-bg-end': '#6DB4D4',
+                        'quiz-accent': '#F4C430',
+                        'quiz-teal': '#2C5F6F',
+                        'quiz-teal-light': '#3A7C8F',
+                        'quiz-blue-light': '#D4EBF7',
+                        'quiz-nav': '#B8E0F0',
+                        'quiz-nav-hover': '#9FD3E8',
+                        'quiz-gray': '#6B7280',
+                        'quiz-gray-light': '#E5E7EB',
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #A8D5E2 0%, #6DB4D4 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover {
+            background-color: #D4EBF7;
+            border-color: #B8E0F0;
+            transform: scale(1.02);
+        }
+        .option-btn.selected {
+            background-color: #D4EBF7;
+            border-color: #2C5F6F;
+            color: #2C5F6F;
+        }
+        .nav-btn:hover {
+            background-color: #9FD3E8;
+            transform: scale(1.1);
+        }
+        .nav-btn:active {
+            transform: scale(0.9);
+        }
+        .progress-segment {
+            height: 6px;
+            flex: 1;
+            max-width: 80px;
+            border-radius: 9999px;
+            transition: background-color 0.3s ease;
+        }
+        .mascot-card {
+            animation: slideInLeft 0.5s ease-out 0.3s both;
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .score-number {
+            animation: scoreReveal 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s both;
+        }
+        @keyframes scoreReveal {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div id="app" class="w-full max-w-3xl relative"></div>
+
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                id: 1,
+                text: 'What sound does a cat make?',
+                options: ['Bhau-Bhau', 'Meow-Meow', 'Oink-Oink'],
+                correctAnswer: 1
+            },
+            {
+                id: 2,
+                text: 'What would you probably find in your fridge?',
+                options: ['Shoes', 'Ice Cream', 'Books'],
+                correctAnswer: 1
+            },
+            {
+                id: 3,
+                text: 'What color are bananas?',
+                options: ['Blue', 'Yellow', 'Red'],
+                correctAnswer: 1
+            },
+            {
+                id: 4,
+                text: 'How many stars are in the sky?',
+                options: ['Two', 'Infinite', 'One Hundred'],
+                correctAnswer: 1
+            }
+        ];
+
+        // State Management
+        let state = {
+            currentQuestion: 0,
+            answers: [null, null, null, null],
+            isComplete: false,
+            score: 0
+        };
+
+        // Calculate Score
+        function calculateScore() {
+            const correctAnswers = state.answers.filter((answer, index) => 
+                answer === quizQuestions[index].correctAnswer
+            ).length;
+            return Math.round((correctAnswers / quizQuestions.length) * 100);
+        }
+
+        // Render Functions
+        function renderProgressBar() {
+            const total = quizQuestions.length;
+            const current = state.currentQuestion + 1;
+            
+            let html = '<div class="flex items-center justify-center gap-2 mb-8">';
+            for (let i = 0; i < total; i++) {
+                const isActive = i < current;
+                const bgColor = isActive ? 'bg-quiz-teal' : 'bg-quiz-gray-light';
+                html += `<div class="progress-segment ${bgColor}"></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderMascot() {
+            return `
+                <div class="mascot-card absolute left-8 bottom-8 bg-white rounded-2xl shadow-lg p-4 max-w-[140px]">
+                    <div class="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45"></div>
+                    <p class="text-sm font-medium text-quiz-teal mb-3 relative z-10">Best of Luck!</p>
+                    <div class="relative w-full h-20 flex items-center justify-center">
+                        <svg width="80" height="80" viewBox="0 0 120 120" fill="none">
+                            <ellipse cx="60" cy="75" rx="28" ry="32" fill="#FFB6D9"/>
+                            <ellipse cx="35" cy="45" rx="12" ry="16" fill="#FFB6D9"/>
+                            <ellipse cx="60" cy="38" rx="12" ry="16" fill="#FFB6D9"/>
+                            <ellipse cx="85" cy="45" rx="12" ry="16" fill="#FFB6D9"/>
+                            <ellipse cx="60" cy="75" rx="28" ry="32" stroke="#FF8DB3" stroke-width="2" fill="none"/>
+                            <ellipse cx="35" cy="45" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+                            <ellipse cx="60" cy="38" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+                            <ellipse cx="85" cy="45" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuestionPage() {
+            const question = quizQuestions[state.currentQuestion];
+            const isFirstQuestion = state.currentQuestion === 0;
+            const isLastQuestion = state.currentQuestion === quizQuestions.length - 1;
+            const selectedAnswer = state.answers[state.currentQuestion];
+
+            return `
+                <div class="fade-in">
+                    <!-- Golden top border -->
+                    <div class="h-1.5 w-full bg-quiz-accent rounded-t-3xl"></div>
+                    
+                    <!-- Main card -->
+                    <div class="quiz-card rounded-b-3xl shadow-lg p-12">
+                        <!-- Header -->
+                        <div class="text-center mb-8">
+                            <h1 class="text-4xl md:text-5xl font-serif italic text-quiz-teal mb-2">
+                                Test Your Knowledge
+                            </h1>
+                            <p class="text-sm text-quiz-gray">
+                                Answer all questions to see your results
+                            </p>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        ${renderProgressBar()}
+
+                        <!-- Question -->
+                        <div class="space-y-6">
+                            <div class="bg-quiz-blue-light rounded-xl py-4 px-6">
+                                <h2 class="text-base font-medium text-gray-800">
+                                    ${state.currentQuestion + 1}. ${question.text}
+                                </h2>
+                            </div>
+
+                            <!-- Options -->
+                            <div class="space-y-3" role="radiogroup">
+                                ${question.options.map((option, index) => `
+                                    <button 
+                                        onclick="selectAnswer(${index})"
+                                        class="option-btn w-full py-4 px-6 rounded-xl text-center text-base font-medium border-2 
+                                               ${selectedAnswer === index ? 'selected' : 'bg-white border-quiz-gray-light text-gray-800'}
+                                               focus:outline-none focus:ring-2 focus:ring-quiz-teal focus:ring-offset-2"
+                                        aria-pressed="${selectedAnswer === index}"
+                                    >
+                                        ${option}
+                                    </button>
+                                `).join('')}
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="flex items-center justify-between pt-4">
+                                <div class="w-10">
+                                    ${!isFirstQuestion ? `
+                                        <button onclick="previousQuestion()" 
+                                                class="nav-btn w-10 h-10 rounded-full bg-quiz-nav flex items-center justify-center transition-all"
+                                                aria-label="Previous question">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="rotate-180">
+                                                <path d="M6 12L10 8L6 4" stroke="#2C5F6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    ` : ''}
+                                </div>
+
+                                <div>
+                                    ${isLastQuestion ? `
+                                        <button onclick="submitQuiz()" 
+                                                class="py-3 px-8 rounded-xl font-medium text-base bg-quiz-nav hover:bg-quiz-nav-hover text-quiz-teal transition-all
+                                                       focus:outline-none focus:ring-2 focus:ring-quiz-teal focus:ring-offset-2
+                                                       ${selectedAnswer === null ? 'opacity-50 cursor-not-allowed' : ''}"
+                                                ${selectedAnswer === null ? 'disabled' : ''}>
+                                            Submit
+                                        </button>
+                                    ` : `
+                                        <button onclick="nextQuestion()" 
+                                                class="nav-btn w-10 h-10 rounded-full bg-quiz-nav flex items-center justify-center transition-all"
+                                                aria-label="Next question">
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M6 12L10 8L6 4" stroke="#2C5F6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mascot (only on first question) -->
+                    ${isFirstQuestion ? renderMascot() : ''}
+                </div>
+            `;
+        }
+
+        function renderResultsPage() {
+            return `
+                <div class="fade-in">
+                    <!-- Golden top border -->
+                    <div class="h-1.5 w-full bg-quiz-accent rounded-t-3xl"></div>
+                    
+                    <!-- Main card -->
+                    <div class="quiz-card rounded-b-3xl shadow-lg py-16 px-12">
+                        <div class="text-center space-y-8">
+                            <p class="text-sm text-quiz-gray">Keep Learning!</p>
+
+                            <div class="space-y-2">
+                                <h2 class="text-3xl font-serif italic text-quiz-teal">
+                                    Your Final score is
+                                </h2>
+                                
+                                <div class="score-number text-8xl md:text-9xl font-serif font-bold text-quiz-teal">
+                                    ${state.score}<span class="text-5xl align-top">%</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button onclick="restartQuiz()" 
+                                        class="py-3 px-8 rounded-xl font-medium text-base bg-quiz-nav hover:bg-quiz-nav-hover text-quiz-teal transition-all
+                                               focus:outline-none focus:ring-2 focus:ring-quiz-teal focus:ring-offset-2">
+                                    Start Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Navigation Functions
+        function selectAnswer(answerIndex) {
+            state.answers[state.currentQuestion] = answerIndex;
+            render();
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion < quizQuestions.length - 1) {
+                state.currentQuestion++;
+                render();
+            }
+        }
+
+        function previousQuestion() {
+            if (state.currentQuestion > 0) {
+                state.currentQuestion--;
+                render();
+            }
+        }
+
+        function submitQuiz() {
+            state.score = calculateScore();
+            state.isComplete = true;
+            render();
+        }
+
+        function restartQuiz() {
+            state = {
+                currentQuestion: 0,
+                answers: [null, null, null, null],
+                isComplete: false,
+                score: 0
+            };
+            render();
+        }
+
+        // Main Render
+        function render() {
+            const app = document.getElementById('app');
+            if (state.isComplete) {
+                app.innerHTML = renderResultsPage();
+            } else {
+                app.innerHTML = renderQuestionPage();
+            }
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>

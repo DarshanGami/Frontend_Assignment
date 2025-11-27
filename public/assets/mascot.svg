@@ -1,0 +1,19 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main paw pad -->
+  <ellipse cx="60" cy="75" rx="28" ry="32" fill="#FFB6D9"/>
+  
+  <!-- Top left toe pad -->
+  <ellipse cx="35" cy="45" rx="12" ry="16" fill="#FFB6D9"/>
+  
+  <!-- Top middle toe pad -->
+  <ellipse cx="60" cy="38" rx="12" ry="16" fill="#FFB6D9"/>
+  
+  <!-- Top right toe pad -->
+  <ellipse cx="85" cy="45" rx="12" ry="16" fill="#FFB6D9"/>
+  
+  <!-- Outline strokes for definition -->
+  <ellipse cx="60" cy="75" rx="28" ry="32" stroke="#FF8DB3" stroke-width="2" fill="none"/>
+  <ellipse cx="35" cy="45" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+  <ellipse cx="60" cy="38" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+  <ellipse cx="85" cy="45" rx="12" ry="16" stroke="#FF8DB3" stroke-width="1.5" fill="none"/>
+</svg>
