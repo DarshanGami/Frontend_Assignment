@@ -1,6 +1,6 @@
 # Quiz Application
 
-A beautiful, pixel-perfect quiz application built with Next.js 14, TypeScript, Tailwind CSS, and Framer Motion. This project demonstrates modern web development practices with a focus on accessibility, animations, and clean code architecture.
+A beautiful, quiz application built with Next.js 14, TypeScript, Tailwind CSS, and Framer Motion. This project demonstrates modern web development practices with a focus on accessibility, animations, and clean code architecture.
 
 ![Quiz App](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=flat-square&logo=typescript)
